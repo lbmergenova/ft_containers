@@ -33,9 +33,9 @@ namespace ft
 
 //construct/copy/destroy:
 	public:
-		explicit vector(const Allocator& _a = Allocator()) : _begin(nullptr), _end(nullptr), _end_cap(nullptr), _alloc(_a) {}
+		explicit vector(const Allocator& _a = Allocator()) : _alloc(_a), _begin(nullptr), _end(nullptr), _end_cap(nullptr) {}
 
-		explicit vector(size_type n, const T& value = T(), const Allocator& _a= Allocator()) : _begin(nullptr), _end(nullptr), _end_cap(nullptr), _alloc(_a){
+		explicit vector(size_type n, const T& value = T(), const Allocator& _a= Allocator()) : _alloc(_a), _begin(nullptr), _end(nullptr), _end_cap(nullptr){
 			if (n > _alloc.max_size())
 				throw std::length_error("bad size vector");
 			else if (n > 0)
