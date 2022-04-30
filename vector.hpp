@@ -61,7 +61,7 @@ namespace ft
 			_end_cap = _end;
 		}
 
-		vector(const vector<T,Allocator>& x) : _begin(nullptr), _end(nullptr), _end_cap(nullptr), _alloc(x.get_allocator()){
+		vector(const vector<T,Allocator>& x) : _alloc(x.get_allocator()), _begin(nullptr), _end(nullptr), _end_cap(nullptr){
 			size_type n = x.size();
 			pointer it = x._begin;
 			if (n > 0)
