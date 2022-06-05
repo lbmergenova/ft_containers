@@ -391,6 +391,18 @@ namespace ft
 			return iterator(__pos);			
 		}
 
+		// iterator erase (iterator position)
+        // {
+        //     size_t i_pos = position - begin();
+		// 	size_t _size = _end - _begin;
+
+        //     for(size_t i = i_pos; i < _size; ++i)
+        //         _begin[i] = _begin[i+1];
+        //     _alloc.destroy(_begin + _size - 1);
+        //     _end--;
+        //     return iterator(_begin + i_pos);
+        // }
+
 		iterator erase(iterator first, iterator last){
 			difference_type diff_pos = first - begin();
 			pointer f_pos = _begin + diff_pos;

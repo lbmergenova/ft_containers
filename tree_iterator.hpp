@@ -3,46 +3,46 @@
 
 namespace ft
 {
-// Node
-	template <class T>
-	struct Node
-	{
-	public:
-		T*		p_value;
-		Node*	parent;
-		Node*	left;
-		Node*	right;
-		bool	red;
-		bool	nil;
+// // Node
+// 	template <class T>
+// 	struct Node
+// 	{
+// 	public:
+// 		T*		p_value;
+// 		Node*	parent;
+// 		Node*	left;
+// 		Node*	right;
+// 		bool	red;
+// 		bool	nil;
 
-		Node(T* v = 0) : p_value(v), parent(nullptr), left(nullptr), right(nullptr), red(true), nil(false) {}
-		Node(Node const &src){
-			if (this != &src)
-			{
-				p_value = src.p_value;
-				parent = src.parent;
-				left = src.left;
-				right = src.right;
-				red = src.red;
-				nil = src.nil;
-			}
-		}
+// 		Node(T* v = 0) : p_value(v), parent(nullptr), left(nullptr), right(nullptr), red(true), nil(false) {}
+// 		Node(Node const &src){
+// 			if (this != &src)
+// 			{
+// 				p_value = src.p_value;
+// 				parent = src.parent;
+// 				left = src.left;
+// 				right = src.right;
+// 				red = src.red;
+// 				nil = src.nil;
+// 			}
+// 		}
 
-		Node& operator=(Node const &src){
-			if (this != &src)
-			{
-				p_value = src.p_value;
-				parent = src.parent;
-				left = src.left;
-				right = src.right;
-				red = src.red;
-				nil = src.nil;
-			}
-			return *this;
-		}
+// 		Node& operator=(Node const &src){
+// 			if (this != &src)
+// 			{
+// 				p_value = src.p_value;
+// 				parent = src.parent;
+// 				left = src.left;
+// 				right = src.right;
+// 				red = src.red;
+// 				nil = src.nil;
+// 			}
+// 			return *this;
+// 		}
 
-		~Node(){} // virtual
-	};
+// 		~Node(){} // virtual
+// 	};
 
 // tree_iter
 //________________________________________________________________________________________________________
@@ -78,10 +78,12 @@ namespace ft
 	public:
 		tree_iter() {}
 
-		tree_iter(_TreeIter __i) : __p_node(__i) {}
+		tree_iter(pointer _x) : __p_node(_x) {}
 
-		reference operator*() const {return *(__p_node->p_value);}
-		pointer operator->() const {return __p_node->p_value;}
+		// tree_iter(_TreeIter __i) : __p_node(__i) {}
+
+		reference operator*() const {return *(__p_node->value);}
+		pointer operator->() const {return __p_node->value;}
 
 		tree_iter& operator++() {
 			if (__p_node->right != nullptr)

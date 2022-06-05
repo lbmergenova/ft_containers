@@ -130,7 +130,7 @@ namespace ft
         //         return false;
         //     ++first1; ++first2;
         // }
-        return false;
+        // return false;
     }
 
     template<class InputIter>

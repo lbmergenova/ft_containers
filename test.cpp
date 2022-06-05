@@ -1,9 +1,12 @@
 #include <iostream>
 #include <vector>
+#include <list>
 #include <stack>
 
 int main()
 {
+    std::list<int> l;
+    
     {
         std::vector<int> arr;
         std::cout << arr.size() << " " << arr.capacity() << " " << arr.max_size() << "\n";
@@ -27,3 +30,18 @@ int main()
 
     return 0;
 }
+
+// #include <utility>      // std::pair, std::make_pair
+// #include <string>       // std::string
+// #include <iostream>     // std::cout
+
+// int main () {
+//   std::pair <int, int> product1(1,11);
+//   std::pair <int, int> product2(0,10);
+
+//   if (product1 < product2)
+//       std::cout << "if (" << product1.first << " < " << product2.first << ")" << std::endl;
+//   else
+//       std::cout << "else (" << product1.first << " > " << product2.first << ")" << std::endl;
+//   return 0;
+// }
