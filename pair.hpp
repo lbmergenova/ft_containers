@@ -12,7 +12,9 @@ namespace ft
         T2 second;
         
         pair() : first(), second() {}
-        pair(const T1& _x, const T2& _y) : first(_x), second(_y) {}
+
+        pair(const first_type& _x, const second_type& _y) : first(_x), second(_y) {}
+
         template<class U, class V>
         pair(const pair<U, V> & _p) : first(_p.first), second(_p.second) {}
 
@@ -32,7 +34,7 @@ namespace ft
 
     };
 
-    template <class T1, class T2> pair<T1,T2> make_pair(const T1& _x, const T2& _y){
+    template <class T1, class T2> pair<T1,T2> make_pair(T1 _x, T2 _y){
         return pair<T1, T2>(_x, _y);
     }
 

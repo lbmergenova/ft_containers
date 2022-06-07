@@ -3,42 +3,11 @@
 
 #include "utility.hpp"
 #include "iterator_traits.hpp"
-// #include "tree_iterator.hpp"
+#include "tree_iterator.hpp"
 #include <memory>
 
 namespace ft
 {
-	// Node
-	template <class T>
-	struct Node
-	{
-	public:
-		T		value;
-		Node*	parent;
-		Node*	left;
-		Node*	right;
-		bool	red;
-
-		Node(T v = T()) : value(v), parent(nullptr), left(nullptr), right(nullptr), red(true) {}
-		
-		Node(Node const &src): value(src.value), parent(src.parent), left(src.left), right(src.right), red(src.red) {}
-
-		Node& operator=(Node const &src)
-		{
-			if (this != &src)
-			{
-				value = src.value;
-				parent = src.parent;
-				left = src.left;
-				right = src.right;
-				red = src.red;
-			}
-			return *this;
-		}
-
-		~Node(){}//std::cout << "Destructer of node" << std::endl;} // virtual
-	};
-
 
 	template <class T, class Compare = std::less<T>, class Allocator = std::allocator<T> >
 	class rb_tree
@@ -56,8 +25,8 @@ namespace ft
 		typedef typename node_allocator::reference			node_reference;
 		typedef typename node_allocator::const_reference	node_const_reference;
 		typedef typename node_allocator::size_type			size_type;
-		// typedef tree_iter<node_pointer>						iterator;
-		// typedef tree_iter<node_const_pointer>				const_iterator;
+		typedef tree_iter<value_type>						iterator;
+		typedef tree_iter<value_type>						const_iterator;
 		// typedef ft::reverse_iterator<iterator>				reverse_iterator;
 		// typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
 
@@ -97,7 +66,7 @@ namespace ft
 		}
 
 	public:
-
+	//helpers
 		void tree_print(void)
 		{
 			inorder_tree_walk(_root);
@@ -105,11 +74,8 @@ namespace ft
 
 	//construct/copy/destroy:
 
-		rb_tree(const node_allocator& a = node_allocator(), const value_compare& comp = value_compare()) : 
-				_node_alloc(a), _compare(comp), _root(nullptr), _size(0)
-		{
-			// _node_alloc.construct(_root, node_type());
-		}
+		rb_tree(const value_compare& comp = value_compare(), const node_allocator& a = node_allocator()) : 
+				_node_alloc(a), _compare(comp), _root(nullptr), _size(0) {}
 
 		// template <class InputIterator>
 		// rb_tree(InputIterator _first, InputIterator _last, const node_allocator& a = node_allocator(), const value_compare& comp = value_compare()) : 
@@ -124,16 +90,29 @@ namespace ft
 		{
 			if (this != &__m) 
 			{
-
+				// ?
 			}     
 			return *this;
 		}
 
 		void clear()
 		{
-			std::cout << "clear" << std::endl;
 			destroy(_root);
 			_size = 0;
+		}
+
+		node_pointer find(node_pointer& node, node_pointer& key_node) const
+		{
+			if (node != nullptr) 
+			{
+				if (!_compare(node->value, key_node->value) && !_compare(key_node->value, node->value))
+					return node;
+				else if (_compare(key_node->value, node->value))
+					return find(node->left, key_node);
+				else
+					return find(node->right, key_node);
+			}
+			return nullptr;
 		}
 
 		void destroy(const node_pointer& _x)
@@ -143,26 +122,33 @@ namespace ft
 			{
 				destroy(_x->left);
 				destroy(_x->right);
-				std::cout << "!destroy node" << std::endl;
 				_node_alloc.destroy(_x);
-				// std::cout << "!destroy deallocate" << std::endl;
-				// _node_alloc.deallocate(_x, 1);
-				// std::cout << "!destroy end" << std::endl;
+				_node_alloc.deallocate(_x, 1);
+			}
+		}
+
+		void destroy_node(const node_pointer& _x){
+			if (_x != nullptr)
+			{
+				_node_alloc.destroy(_x);
+				_node_alloc.deallocate(_x, 1);
 			}
 		}
 
 		~rb_tree()
 		{
-			std::cout << "Destructer rb_tree" << std::endl;
 			destroy(_root);
-			std::cout << "end Destructer rb_tree" << std::endl;
 		}
 
 	//iterators
-			node_pointer begin() {return min(_root);}
-			node_const_pointer begin() const {return min(_root);}
-			node_pointer end() {return max(_root);}
-			node_const_pointer end() const {return max(_root);}
+			iterator begin() {return min(_root);}
+			const_iterator begin() const {return min(_root);}
+			iterator end() {return max(_root);}
+			const_iterator end() const {return max(_root);}
+			// node_pointer begin() {return min(_root);}
+			// node_const_pointer begin() const {return min(_root);}
+			// node_pointer end() {return max(_root);}
+			// node_const_pointer end() const {return max(_root);}
 
 	//capacity
 			bool      empty() const {return _size == 0;}
@@ -206,60 +192,50 @@ namespace ft
 			__x->parent = __y;
 		}
 
-		void insert(node_pointer z)
+		node_pointer init_node(value_type v_x)
+		{
+			node_pointer z = _node_alloc.allocate(1);
+			_node_alloc.construct(z, v_x);
+			return z;
+		}
+
+		void insert(node_pointer& z)
 		{
 			node_pointer y = nullptr;
 			node_pointer x = _root;
-			std::cout << "   insert" << std::endl;
-			std::cout << "   z:" << z << " " << z->value << " " << z->value.first << " " << z->value.second << std::endl;
+			// std::cout << "   insert" << std::endl;
+			// std::cout << "   z:" << z << " " << " " << z->value.first << " " << z->value.second << std::endl;
 			while (x != nullptr)
 			{
-				std::cout << "   insert while" << std::endl;
-				std::cout << "   x:" << x << " " << x->value << " " << x->value.first << " " << x->value.second << std::endl;
+				// std::cout << "   x:" << x << " " << " " << x->value.first << " " << x->value.second << std::endl;
 				y = x;
-				if (z->value < x->value) // _compare(z->value, x->value)
-				{
-					std::cout << "   insert while <" << std::endl;
+				if (_compare(z->value, x->value)) // _compare(z->value, x->value) z->value < x->value
 					x = x->left;
-				}
 				else
-				{
-					std::cout << "   insert while >" << std::endl;
 					x = x->right;
-				}
 			}
 			z->parent = y;
 			if (y == nullptr)
-			{
-				// std::cout << "y == nullptr" << std::endl;
 				_root = z;
-			}
-			else if (z->value < y->value) // _compare(z->value, y->value)
-			{
-				// std::cout << "_compare(z->value, y->value)" << std::endl;
+			else if (_compare(z->value, y->value)) // _compare(z->value, y->value) z->value < y->value
 				y->left = z;
-			}
 			else
-			{
-				// std::cout << "else _compare()" << std::endl;
 				y->right = z;
-			}
 			z->left = nullptr;
 			z->right = nullptr;
 			z->red = true;
+			++_size;
 			insert_fixup(z);
 		}
 
-		void insert_fixup(node_pointer z)
+		void insert_fixup(node_pointer& z)
 		{
-			std::cout << "     _fixup" << std::endl;
+			// std::cout << "     _fixup" << std::endl;
 			node_pointer y = nullptr;
 			while (z != _root && z->parent->red == true)
 			{
-				std::cout << "!  _fixup" << std::endl;
 				if (z->parent == z->parent->parent->left)
 				{
-					std::cout << "!-1 _fixup" << std::endl;
 					y = z->parent->parent->right;
 					if (y->red == true)
 					{
@@ -282,9 +258,8 @@ namespace ft
 				}
 				else
 				{
-					std::cout << "!-2 _fixup" << std::endl;
 					y = z->parent->parent->left;
-					if (y->red == true)
+					if (y && y->red == true)
 					{
 						z->parent->red = false;
 						y->red = false;
@@ -304,11 +279,10 @@ namespace ft
 					}
 				}
 			}
-			std::cout << "end  _fixup" << std::endl;
 			_root->red = false;
 		}
 
-		void transplant(node_pointer x, node_pointer y)
+		void transplant(node_pointer& x, node_pointer& y)
 		{
 			if (x->parent == nullptr)
 				_root = y;
@@ -319,7 +293,7 @@ namespace ft
 			y->parent = x->parent;
 		}
 
-		void erase(node_pointer z)
+		void erase(node_pointer& z)
 		{
 			node_pointer x;
 			node_pointer y = z;
@@ -355,7 +329,7 @@ namespace ft
 				erase_fixup(x);
 		}
 
-		void erase_fixup(node_pointer x)
+		void erase_fixup(node_pointer& x)
 		{
 			node_pointer w;
 			while (x != _root && x->red == false)
@@ -425,6 +399,138 @@ namespace ft
 			}
 			x->red = false;
 		}
+
+		void delete_node(node_pointer& z)
+		{
+			node_pointer x;
+			node_pointer y = z;
+			bool y_is_red = y->red;
+			if (z->left == nullptr)
+			{
+				x = z->right;
+				transplant(z, z->right);
+			}
+			else if (z->right == nullptr)
+			{
+				x = z->left;
+				transplant(z, z->left);
+			}
+			else
+			{
+				y = min(z);
+				y_is_red = y->red;
+				x = y->right;
+				if (y->parent == z)
+					x->parent = y;
+				else
+				{
+					transplant(y, y->right);
+					y->right = z->right;
+					y->right->parent = y;
+				}
+				transplant(z,y);
+				y->left = z->left;
+				y->left->parent = y;
+				y->red = z->red;
+			}
+			if (y_is_red == false)
+				delete_fixup(x);
+		}
+		
+		void delete_fixup(node_pointer& x)
+		{
+			node_pointer w;
+			while (x != _root && x->red == false)
+			{
+				if (x == x->parent->left)
+				{
+					w = x->parent->right;
+					if (w->red == true)
+					{
+						w->red = false;
+						x->parent->red = true;
+						rotate_left(x->parent);
+						w = x->parent->right;
+					}
+					if (w->left->red == false and w->right->red == false)
+					{
+						w->red = true;
+						x = x->parent;
+					}
+					else if (w->right->red == false)
+					{
+						w->left->red = false;
+						w->red = true;
+						rotate_right(w);
+						w = x->parent->right;
+					}
+					else
+					{
+						w->red = x->parent->red;
+						x->parent->red = false;
+						w->right->red = false;
+						rotate_left(x->parent);
+						x = _root;
+					}
+				}
+				else
+				{
+					w = x->parent->left;
+					if (w->red == true)
+					{
+						w->red = false;
+						x->parent->red = true;
+						rotate_right(x->parent);
+						w = x->parent->left;
+					}
+					if (w->right->red == false and w->left->red == false)
+					{
+						w->red = true;
+						x = x->parent;
+					}
+					else if (w->left->red == false)
+					{
+						w->right->red = false;
+						w->red = true;
+						rotate_left(w);
+						w = x->parent->left;
+					}
+					else
+					{
+						w->red = x->parent->red;
+						x->parent->red = false;
+						w->left->red = false;
+						rotate_right(x->parent);
+						x = _root;
+					}
+				}
+			}
+			x->red = false;
+		}
+
+		void swap(rb_tree& other){
+			if (this != other)
+			{
+				std::swap(_node_alloc, other._node_alloc);
+				std::swap(_compare, other._compare);
+				std::swap(_root, other._root);
+				std::swap(_size, other._size);
+			}
+		}
+
+	// additionally
+
+		// void insert(iterator& first, iterator& last)
+		// {
+		// 	node_pointer __f = static_cast<node_pointer>(first);
+		// 	while (first != last)
+		// 	{
+		// 		insert(__f);
+		// 		++__f;
+		// 		++first;
+		// 	}
+		// }
+
 	};
 
 } // namespace ft
