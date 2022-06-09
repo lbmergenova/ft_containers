@@ -11,13 +11,14 @@ namespace ft
 	struct Node
 	{
 	public:
-		T		value;
+		T*		value;
 		Node*	parent;
 		Node*	left;
 		Node*	right;
 		bool	red;
 
-		Node(T v = T()) : value(v), parent(nullptr), left(nullptr), right(nullptr), red(true) {}
+		Node() : value(nullptr), parent(nullptr), left(nullptr), right(nullptr), red(true) {}
+		Node(T* v) : value(v), parent(nullptr), left(nullptr), right(nullptr), red(true) {}
 		
 		Node(Node const &src): value(src.value), parent(src.parent), left(src.left), right(src.right), red(src.red) {}
 
@@ -34,7 +35,11 @@ namespace ft
 			return *this;
 		}
 
-		~Node(){std::cout << "Destructer of node" << std::endl;} // virtual
+		~Node(){
+			std::allocator<T> _alloc;
+			_alloc.destroy(value);
+			_alloc.deallocate(value,1);
+		} // virtual
 	};
 
 // tree_iter
@@ -54,7 +59,9 @@ namespace ft
 		typedef typename iterator_traits<iterator_type>::reference			reference;
 
 	private:
-		iterator_type	__p_node;
+		// iterator_type	__p_node;
+		pointer	__p_node;
+		pointer	__root;
 
 		inline pointer tree_min(pointer p_x){
 			while (p_x->left != nullptr)
@@ -68,10 +75,28 @@ namespace ft
 			return p_x;
 		}
 
+		// pointer next(pointer x)// everything is fine!
+        //     {
+        //         // std::cout << "successor"<< std::endl;
+        //         //to do& try and catch
+        //         if(x == nullptr)
+        //             return NULL;
+        //         if(x->right != nullptr)//leftmost node in right subtree
+        //             return tree_min(x->right);
+        //         pointer y = nullptr;
+        //         y = x->parent;
+        //         while(y != nullptr && x == y->right)
+        //         {
+        //             x = y;
+        //             y = y->parent;
+        //         }
+        //         return y;
+        //     }
+
         pointer next(pointer node)
         {
             if (node == nullptr)
-                return node;
+                return nullptr;
 
             if (node->right != nullptr)
                 return tree_min(node->right);
@@ -87,7 +112,7 @@ namespace ft
         pointer prev(pointer node)
         {
             if (node == nullptr)
-                return node->parent;
+                return tree_max(__root);
 
             if (node != nullptr && node->left != nullptr)
                 return tree_max(node->left);
@@ -104,16 +129,15 @@ namespace ft
 	public:
 		tree_iter() {}
 
-		tree_iter(pointer _x) : __p_node(_x) {}
+		tree_iter(pointer _x, pointer root) : __p_node(_x), __root(root) {}
 
-		// tree_iter(_TreeIter __i) : __p_node(__i) {}
-
-		value_type operator*() const {return *__p_node ;}
-		pointer operator->() const {return __p_node;}
+		_Tp& operator*() const {return *(__p_node->value) ;}
+		_Tp* operator->() const {return __p_node->value ;}
 
 
         tree_iter& operator++()
         {
+			pointer	t;
             __p_node = next(__p_node);
             return *this;
         }
@@ -121,6 +145,7 @@ namespace ft
         tree_iter operator++(int)
         {
             tree_iter tmp(*this);
+			pointer	t;
             __p_node = next(__p_node);
             return tmp;
         }
@@ -227,106 +252,3 @@ namespace ft
 } // namespace ft
 
 #endif
-
-
-
-// DRAFT
-
-// // tree_iter
-// //________________________________________________________________________________________________________
-// //________________________________________________________________________________________________________
-
-// 	template <class _TreeIter>
-// 	class tree_iter
-// 	{
-// 	public:
-
-// 		typedef _TreeIter													iterator_type;
-// 		typedef std::bidirectional_iterator_tag								iterator_category;
-// 		typedef typename iterator_traits<iterator_type *>::value_type		value_type;
-// 		typedef typename iterator_traits<iterator_type *>::difference_type	difference_type;
-// 		typedef typename iterator_traits<iterator_type *>::pointer			pointer;
-// 		typedef typename iterator_traits<iterator_type *>::reference		reference;
-// 		typedef Node<typename remove_const<_TreeIter>::type>*				node_pointer;
-
-// 	private:
-// 		node_pointer	__p_node;
-
-// 		inline node_pointer tree_min(node_pointer p_x){
-// 			while (p_x->left != nullptr)
-// 				p_x = p_x->left;
-// 			return p_x;
-// 		}
-
-// 		inline node_pointer tree_max(node_pointer p_x){
-// 			while (p_x->right != nullptr)
-// 				p_x = p_x->right;
-// 			return p_x;
-// 		}
-
-// 	public:
-// 		tree_iter() {}
-
-// 		tree_iter(_TreeIter __i) : __p_node(__i.__p_node) {}
-
-// 		reference operator*() const {return *(__p_node->p_value);}
-// 		pointer operator->() const {return __p_node->p_value;}
-
-// 		tree_iter& operator++() {
-// 			if (__p_node->right != nullptr)
-// 				return tree_min(__p_node->right);
-// 			node_pointer next = __p_node;
-// 			while (next != nullptr && __p_node == next->right)
-// 			{
-// 				__p_node = next;
-// 				next = next->parent;
-// 			}
-// 			__p_node = next;
-// 			return *this;
-// 		}
-
-// 		tree_iter operator++(int){
-// 			tree_iter tmp(*this);
-// 			if (__p_node->right != nullptr)
-// 				return tree_min(__p_node->right);
-// 			node_pointer next = __p_node->parent;
-// 			while (next != nullptr && __p_node == next->right)
-// 			{
-// 				__p_node = next;
-// 				next = next->parent;
-// 			}
-// 			__p_node = next;
-// 			return tmp;
-// 		}
-
-// 		tree_iter& operator--() {
-// 			if (__p_node->left != nullptr)
-// 				return tree_max(__p_node->left);
-// 			node_pointer before = __p_node->parent;
-// 			while (before != nullptr && __p_node == before->left)
-// 			{
-// 				__p_node = before;
-// 				before = before->parent;
-// 			}
-// 			__p_node = before;
-// 			return *this;
-// 		}
-// 		tree_iter operator--(int){
-// 			tree_iter tmp(*this);
-// 			if (__p_node->left != nullptr)
-// 				return tree_max(__p_node->left);
-// 			node_pointer before = __p_node->parent;
-// 			while (before != nullptr && __p_node == before->left)
-// 			{
-// 				__p_node = before;
-// 				before = before->parent;
-// 			}
-// 			__p_node = before;
-// 			return tmp;
-// 		}
-
-// 		friend bool operator==(const tree_iter& __x, const tree_iter& __y)
-// 			{return __x.__p_node == __y.__p_node;}
-
-// 		friend bool operator!=(const tree_iter& __x, const tree_iter& __y)
-// 			{return __x.__p_node != __y.__p_node;}

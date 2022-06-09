@@ -25,7 +25,7 @@ namespace ft
 		typedef typename allocator_type::const_pointer		const_pointer;
 		typedef typename allocator_type::size_type			size_type;
 		typedef typename allocator_type::difference_type	difference_type;
-		// typedef tree_iter<pointer>							iterator;
+		typedef tree_iter<value_type>						iterator;
 		// typedef __map_const_iterator<typename __base::const_iterator> const_iterator;
 		// typedef ft::reverse_iterator<iterator>				reverse_iterator;
 		// typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
@@ -45,6 +45,7 @@ namespace ft
 	private:
 
 		typedef rb_tree<value_type, value_compare, allocator_type>   __base;
+		// typedef typename __base::node_pointer						node_poiner;
 
 		__base			__tree_;
 		key_compare		_key_comp;
@@ -52,7 +53,7 @@ namespace ft
 
 	public:
 
-		typedef typename __base::iterator					iterator;
+		// typedef typename __base::iterator					iterator;
 		// typedef tree_iter<typename __base::node_pointer>		iterator;
 
 		template <class Key2, class Value2, class Comp2, class Alloc2>
@@ -69,10 +70,8 @@ namespace ft
 		{
 			while (first != last)
 			{
-				// __tree_.insert(&first);
-				insert(first->value);
+				insert(*first);
 				first++;
-				std::cout << "here " << first->value.first  << " " << &first << " " << &last << std::endl;
 			}
 		}
 
@@ -93,9 +92,9 @@ namespace ft
 		allocator_type get_allocator() const {return _alloc;}
 
 //iterators
-		iterator begin() {return __tree_.begin();}
+		iterator begin() {return iterator(__tree_.begin(), __tree_.get_root());}
 		// const_iterator begin() const {return __tree_.begin();}
-		iterator end() {return __tree_.end();}
+		iterator end() {return iterator(__tree_.end(), __tree_.get_root());}
 		// const_iterator end() const {return __tree_.end();}
 
 		// reverse_iterator rbegin() {return reverse_iterator(end());}
@@ -109,10 +108,42 @@ namespace ft
 		size_type max_size() const {return __tree_.max_size();}
 
 //element access
-		mapped_type& operator[](const key_type& __k);
+		mapped_type& operator[](const key_type& __k)
+		{
+			value_type _vt(__k, T());
+			node_pointer node_ptr = init_node(_vt);
+			node_pointer __find = __tree_.find(node_ptr);
+			if (__find == nullptr)
+			{
+				pair<node_pointer, bool> rez = __tree_.insert(node_ptr);
+				return rez.first->value->second;
+			}
+			else
+			{
+				destroy_node(node_ptr);
+				return __find->value->second; 
+			}
+		}
 
-		mapped_type& at(const key_type& __k);
-		const mapped_type& at(const key_type& __k) const;
+		mapped_type& at(const key_type& __k){
+			value_type _vt(__k, T());
+			node_pointer node_ptr = init_node(_vt);
+			node_pointer __find = __tree_.find(node_ptr);
+			if (__find == nullptr)
+				throw std::out_of_range("map::at:  key not found");
+			destroy_node(node_ptr);
+			return __find->value->second;
+		}
+
+		const mapped_type& at(const key_type& __k) const{
+			value_type _vt(__k, T());
+			node_pointer node_ptr = init_node(_vt);
+			node_pointer __find = __tree_.find(node_ptr);
+			if (__find == nullptr)
+				throw std::out_of_range("map::at:  key not found");
+			destroy_node(node_ptr);
+			return __find->value->second;			
+		}
 
 //modifiers
 
@@ -121,10 +152,15 @@ namespace ft
 
 		// value_compare  value_comp()    const {return value_compare(__tree_.value_comp().key_comp());}
 
-		// pair<iterator, bool> insert(const value_type& __v) {}
-		void insert(const value_type& __v) { 
-			__node_pointer node_ptr = init_node(__v);
-			__tree_.insert(node_ptr);
+		pair<iterator, bool> insert(const value_type& __v) {
+		// void insert(const value_type& __v) { 
+			node_pointer node_ptr = init_node(__v);
+			pair<node_pointer, bool> ret = __tree_.insert(node_ptr);
+			if (!ret.second)
+				destroy_node(node_ptr);
+			// std::cout << "insert map" << std::endl;
+			pair<iterator, bool> rez(iterator(ret.first, __tree_.get_root()), ret.second);
+			return rez;
 		}
 
 		void tree_print(void)
@@ -132,21 +168,41 @@ namespace ft
 			__tree_.tree_print();
 		}
 
-		// iterator insert(const_iterator __p, const value_type& __v)
-		// 	{return __tree_.__insert_unique(__p.__i_, __v);}
+		iterator insert(iterator __p, const value_type& __v){
+			(void)__p;
+			pair<iterator, bool> rez = insert(__v);
+			return rez.first;
+		}
 
 		template <class InputIter>
-		void insert(InputIter __f, InputIter __l)
-		{
-			__tree_.insert(__f, __l);
+		void insert(InputIter first, InputIter last){
+			while (first != last)
+			{
+				insert(*first);
+				first++;
+			}
 		}
 
 		// iterator erase(const_iterator __p) {return __tree_.erase(__p.__i_);}
 
 		// iterator erase(iterator __p)       {return __tree_.erase(__p.__i_);}
 
-		// size_type erase(const key_type& __k)
-		// 	{return __tree_.__erase_unique(__k);}
+		size_type erase(const key_type& __k)
+		{
+			// if (size() == 0)
+			// 	return 0;
+			value_type _vt(__k, T());
+			node_pointer node_ptr = init_node(_vt);
+			node_pointer _find = __tree_.find(node_ptr);
+			destroy_node(node_ptr);
+			if (_find == nullptr)
+			{
+				return 0;
+			}
+			__tree_.erase(_find);
+			// destroy_node(_find);
+			return 1;
+		}
 
 		// iterator  erase(const_iterator __f, const_iterator __l)
 		// 	{return __tree_.erase(__f.__i_, __l.__i_);}
@@ -159,7 +215,10 @@ namespace ft
 //lookup
 		iterator find(const key_type& __k){
 			value_type _vt(__k, T());
-			return __tree_.find(_vt);
+			node_pointer node_ptr = init_node(_vt);
+			node_pointer ret = __tree_.find(node_ptr);
+			destroy_node(node_ptr);
+			return iterator(ret, __tree_.get_root());
 		}
 
 		// const_iterator find(const key_type& __k) const {return __tree_.find(__k);}
@@ -188,15 +247,24 @@ namespace ft
 	private:
 		typedef typename __base::node_allocator			 	__node_allocator;
 		typedef typename __base::node_type				 	__node_type;
-		typedef typename __base::node_pointer			 	__node_pointer;
+		typedef typename __base::node_pointer			 	node_pointer;
 
 
-		__node_pointer init_node(const value_type& __vt)
+		node_pointer init_node(const value_type& __vt)
+		{
+			pointer __p_vt = _alloc.allocate(1);
+			_alloc.construct(__p_vt, __vt);
+			__node_allocator _node_alloc;
+			node_pointer __node_ptr = _node_alloc.allocate(1);
+			_node_alloc.construct(__node_ptr, __p_vt);
+			return __node_ptr;
+		}
+
+		void destroy_node(node_pointer _node)
 		{
 			__node_allocator _node_alloc;
-			__node_pointer __node_ptr = _node_alloc.allocate(1);
-			_node_alloc.construct(__node_ptr, __vt);
-			return __node_ptr;
+			_node_alloc.destroy(_node);
+			_node_alloc.deallocate(_node, 1);
 		}
 	// 	typedef typename __base::__node_allocator		  __node_allocator;
 	// 	typedef typename __base::__node_pointer		    __node_pointer;
@@ -245,7 +313,7 @@ inline bool operator<=(const map<Key, T, Compare, Allocator>& __x,
 namespace std
 {
 	template <class Key, class T, class Compare, class Allocator>
-	inline void swap(map<Key, T, Compare, Allocator>& __x, map<Key, T, Compare, Allocator>& __y)
+	inline void swap(ft::map<Key, T, Compare, Allocator>& __x, ft::map<Key, T, Compare, Allocator>& __y)
 	{
 		__x.swap(__y);
 	}

@@ -25,8 +25,8 @@ namespace ft
 		typedef typename node_allocator::reference			node_reference;
 		typedef typename node_allocator::const_reference	node_const_reference;
 		typedef typename node_allocator::size_type			size_type;
-		typedef tree_iter<value_type>						iterator;
-		typedef tree_iter<value_type>						const_iterator;
+		// typedef tree_iter<value_type>						iterator;
+		// typedef tree_iter<value_type>						const_iterator;
 		// typedef ft::reverse_iterator<iterator>				reverse_iterator;
 		// typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
 
@@ -39,6 +39,10 @@ namespace ft
 		size_type												_size;
 
 		inline node_pointer min(node_pointer p_x){
+			if (_size == 0)
+				return nullptr;
+			if (p_x == nullptr)
+				return p_x;
 			while (p_x->left != nullptr)
 				p_x = p_x->left;
 			return p_x;
@@ -62,7 +66,7 @@ namespace ft
 
 		void prnt_node(node_pointer _x)
 		{
-			std::cout << "key " << _x->value.first << " value " << _x->value.second <<std::endl;
+			std::cout << "key " << _x->value->first << " value " << _x->value->second <<std::endl;
 		}
 
 	public:
@@ -99,20 +103,26 @@ namespace ft
 		{
 			destroy(_root);
 			_size = 0;
+			_root = nullptr;
 		}
 
-		node_pointer find(node_pointer& node, node_pointer& key_node) const
+		node_pointer find(node_pointer& node, node_pointer& key_node)
 		{
 			if (node != nullptr) 
 			{
-				if (!_compare(node->value, key_node->value) && !_compare(key_node->value, node->value))
+				if (!_compare(*node->value, *key_node->value) && !_compare(*key_node->value, *node->value))
 					return node;
-				else if (_compare(key_node->value, node->value))
+				else if (_compare(*key_node->value, *node->value))
 					return find(node->left, key_node);
 				else
 					return find(node->right, key_node);
 			}
 			return nullptr;
+		}
+
+		node_pointer find(node_pointer& key_node)
+		{
+			return find(_root, key_node);
 		}
 
 		void destroy(const node_pointer& _x)
@@ -141,13 +151,13 @@ namespace ft
 		}
 
 	//iterators
-			iterator begin() {return min(_root);}
-			const_iterator begin() const {return min(_root);}
-			iterator end() {return max(_root);}
-			const_iterator end() const {return max(_root);}
-			// node_pointer begin() {return min(_root);}
+			// iterator begin() {return min(_root);}
+			// const_iterator begin() const {return min(_root);}
+			// iterator end() {return _end(_root);}
+			// const_iterator end() const {return _end(_root);}
+			node_pointer begin() {return min(_root);}
 			// node_const_pointer begin() const {return min(_root);}
-			// node_pointer end() {return max(_root);}
+			node_pointer end() {return nullptr;}
 			// node_const_pointer end() const {return max(_root);}
 
 	//capacity
@@ -160,6 +170,9 @@ namespace ft
 
 		void rotate_left(node_pointer __x)
 		{
+			// std::cout << "  rotate_left" << std::endl;
+			if (__x == nullptr)
+				return ;
 			node_pointer __y = __x->right;
 			__x->right = __y->left;
 			if (__y->left != nullptr)
@@ -177,6 +190,9 @@ namespace ft
 
 		void rotate_right(node_pointer __x)
 		{
+			// std::cout << "  rotate_right" << std::endl;
+			if (__x == nullptr)
+				return ;
 			node_pointer __y = __x->left;
 			__x->left = __y->right;
 			if (__y->right != nullptr)
@@ -199,17 +215,23 @@ namespace ft
 			return z;
 		}
 
-		void insert(node_pointer& z)
+		pair<node_pointer, bool> insert(node_pointer& z)
+		// void insert(node_pointer& z)
 		{
+			pair<node_pointer, bool> ret;
+			ret.first = find(_root,z);
+			if (ret.first != nullptr)
+			{
+				ret.second = false;
+				return ret;
+			}
 			node_pointer y = nullptr;
 			node_pointer x = _root;
-			// std::cout << "   insert" << std::endl;
-			// std::cout << "   z:" << z << " " << " " << z->value.first << " " << z->value.second << std::endl;
 			while (x != nullptr)
 			{
 				// std::cout << "   x:" << x << " " << " " << x->value.first << " " << x->value.second << std::endl;
 				y = x;
-				if (_compare(z->value, x->value)) // _compare(z->value, x->value) z->value < x->value
+				if (_compare(*z->value, *x->value)) // _compare(z->value, x->value) z->value < x->value
 					x = x->left;
 				else
 					x = x->right;
@@ -217,20 +239,23 @@ namespace ft
 			z->parent = y;
 			if (y == nullptr)
 				_root = z;
-			else if (_compare(z->value, y->value)) // _compare(z->value, y->value) z->value < y->value
+			else if (_compare(*z->value, *y->value)) // _compare(z->value, y->value) z->value < y->value
 				y->left = z;
 			else
 				y->right = z;
 			z->left = nullptr;
 			z->right = nullptr;
 			z->red = true;
-			++_size;
 			insert_fixup(z);
+			// std::cout << "insert tree" << std::endl;
+			++_size;
+			ret.first = z;
+			ret.second = true;
+			return ret;
 		}
 
 		void insert_fixup(node_pointer& z)
 		{
-			// std::cout << "     _fixup" << std::endl;
 			node_pointer y = nullptr;
 			while (z != _root && z->parent->red == true)
 			{
@@ -258,6 +283,7 @@ namespace ft
 				}
 				else
 				{
+					// std::cout << "else     _fixup" << std::endl;
 					y = z->parent->parent->left;
 					if (y && y->red == true)
 					{
@@ -284,32 +310,50 @@ namespace ft
 
 		void transplant(node_pointer& x, node_pointer& y)
 		{
+			if (y == nullptr)
+				return ;
 			if (x->parent == nullptr)
+			{
+				// std::cout << "_root = y" <<std::endl;
 				_root = y;
+			}
 			else if (x == x->parent->left)
+			{
+				// std::cout << "x->parent->left = y" <<std::endl;
 				x->parent->left = y;
+			}
 			else
+			{
+				// std::cout << "x->parent->right = y" <<std::endl;
 				x->parent->right = y;
+			}
+			// std::cout << "transplant" <<std::endl;
 			y->parent = x->parent;
 		}
 
 		void erase(node_pointer& z)
 		{
+			std::cout << "tree erase" <<std::endl;
+			if (_size == 0)
+				return ;
 			node_pointer x;
 			node_pointer y = z;
 			bool y_is_red = y->red;
 			if (z->left == nullptr)
 			{
+			// std::cout << "tree erase if" <<std::endl;
 				x = z->right;
 				transplant(z, z->right);
 			}
 			else if (z->right == nullptr)
 			{
+			// std::cout << "tree erase elseif" <<std::endl;
 				x = z->left;
 				transplant(z, z->left);
 			}
 			else 
 			{
+			// std::cout << "tree erase else" <<std::endl;
 				y = min(z->right);
 				y_is_red = y->red;
 				x = y->right;
@@ -327,15 +371,20 @@ namespace ft
 			}
 			if (y_is_red == false)
 				erase_fixup(x);
+			--_size;
 		}
 
 		void erase_fixup(node_pointer& x)
 		{
+			std::cout << "erase_fixup" <<std::endl;
 			node_pointer w;
+			if (x == nullptr)
+				return ;
 			while (x != _root && x->red == false)
 			{
 				if (x == x->parent->left)
 				{
+					std::cout << "erase_fixup if" <<std::endl;
 					w = x->parent->right;
 					if (w->red == true)
 					{
@@ -367,6 +416,7 @@ namespace ft
 				}
 				else
 				{
+					std::cout << "erase_fixup else" <<std::endl;
 					w = x->parent->left;
 					if (w->red == true)
 					{
@@ -518,6 +568,7 @@ namespace ft
 			}
 		}
 
+		node_pointer get_root() const { return _root; }
 	// additionally
 
 		// void insert(iterator& first, iterator& last)

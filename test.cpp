@@ -1,7 +1,7 @@
 #include <iostream>
-#include <vector>
-#include <list>
-#include <stack>
+// #include <vector>
+// #include <list>
+// #include <stack>
 #include "vector.hpp"
 
 int main()
@@ -28,13 +28,22 @@ int main()
 
     // std::cout << pair3.first << " "<< pair3.second << std::endl;
 
-    std::vector<int> std_arr1(3,100);
-    std::vector<int> std_arr2(2,300);
-    ft::vector<int> ft_arr1(3,100);
-    ft::vector<int> ft_arr2(2,300);
+    // std::vector<int> std_arr1(3,100);
+    // std::vector<int> std_arr2(2,300);
+    // ft::vector<int> ft_arr1(3,100);
+    // ft::vector<int> ft_arr2(2,300);
 
-    std::cout << (std_arr1 < std_arr2) << std::endl;
-    std::cout << (ft_arr1 < ft_arr2) << std::endl;
+    // std::cout << (std_arr1 < std_arr2) << std::endl;
+    // std::cout << (ft_arr1 < ft_arr2) << std::endl;
+
+    {
+        ft::vector <int> m;
+        m.push_back(5);
+        ft::vector<int>::iterator it = m.begin();
+        ft::vector<int>::const_iterator itc = m.end();
+        // it = itc;
+        itc = it;
+    }
 
     return 0;
 }
