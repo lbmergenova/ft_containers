@@ -18,7 +18,6 @@ namespace ft
 		bool	red;
 
 		Node() : value(nullptr), parent(nullptr), left(nullptr), right(nullptr), red(true) {}
-		Node(bool _red) : value(nullptr), parent(nullptr), left(nullptr), right(nullptr), red(_red) {}
 		Node(T* v) : value(v), parent(nullptr), left(nullptr), right(nullptr), red(true) {}
 		
 		Node(Node const &src): value(src.value), parent(src.parent), left(src.left), right(src.right), red(src.red) {}
@@ -60,25 +59,25 @@ namespace ft
 
 		inline pointer min(pointer p_x)
 		{
-			while (p_x->left->value != nullptr)
+			while (p_x->left != nullptr)
 				p_x = p_x->left;
 			return p_x;
 		}
 
 		inline pointer max(pointer p_x)
 		{
-			while (p_x->right->value != nullptr)
+			while (p_x->right != nullptr)
 				p_x = p_x->right;
 			return p_x;
 		}
 
-		pointer next(pointer x)
-		{
+        pointer next(pointer x)
+        {
 			// std::cout << "next->" << std::endl;
-			if (x->value != nullptr && x->right->value != nullptr)
+			if (x != nullptr && x->right != nullptr)
 				return min(x->right);
 			pointer y = x->parent;
-			while (y->value != nullptr && x == y->right)
+			while (y != nullptr && x == y->right)
 			{
 				x = y;
 				y = y->parent;

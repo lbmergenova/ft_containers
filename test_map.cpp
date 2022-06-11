@@ -17,115 +17,67 @@
 
 #include <stdlib.h>
 
-#define MAX_RAM 4294967296
-
 #define COUNT 5
 
+void print_tree(ft::map<int, int>::iterator first, ft::map<int, int>::iterator last, int size )
+{
+    int i = -1;
+    std::cout << "PRINT TREE size: " << size << std::endl;
+    while (first != last)
+    {
+        std::cout << ++i << "  : " << first->first << " " << first->second << std::endl;
+        first++;
+    }
+}
+
+ft::map<int, int> construct_map(ft::map<int, int> mp)
+{
+    std::cout << " f !!!" << std::endl;
+    ft::map<int, int> mp2(mp);
+    print_tree(mp.begin(), mp.end(), mp.size());
+    for (int i = 100, j = 10; i < 105; ++i, ++j) {
+        mp.insert(ft::make_pair(i, j));
+    }
+    return mp2;
+}
+
 int main(int argc, char** argv) {
-
+    int i = -1;
+    int _ratio = 100000;
     std::cout << "____________" << TYPE << "____________" << std::endl;
-	// ft::map<int, int> mp;
-	
-	// for (int i = 0, j = 10; i < COUNT; ++i, ++j)
-	// {
-	// 	mp.insert(ft::make_pair<int, int>(i, j));
-	// }
-    // for (int i = 2; i < 10; i++)
-    // {
-    //     mp.insert(ft::make_pair<int, int>(i, 15));
-    // }
-
-    // std::cout << "//--//--//--MP/--//--//--//" << std::endl;
-
-    // ft::map<int, int> mp2(mp.begin(), mp.end());
-    // // mp.tree_print();
-    // std::cout << mp.size() << std::endl;
-
-    // ft::map<int,int>::iterator it;
-    // it = mp.find(3);
-    // if (it != mp.end())
-    //     std::cout << "find " << it->second << std::endl;
-    // else
-    //     std::cout << "not find" << std::endl;
-
-    // // ft::map<int, int>::iterator it = mp.begin();
-    // // std::cout << it->first << std::endl;
-
-    // // std::cout << "//--//--//--MP2/--//--//--//" << std::endl;
-
-    // // mp2.clear();
-
-    // std::cout << "**************************" << std::endl;
-    // {
-    //     ft::map<int, int>::iterator it = mp2.begin();
-    //     ft::map<int, int>::iterator it_end = mp2.end();
-    //     // std::cout << &it << std::endl;
-    //     // std::cout << &it_end << std::endl;
-    //     std::cout << std::endl;
-    //     int i = -1;
-    //     while (it != it_end)
-    //     {
-    //         // std::cout << &it << std::endl;
-    //         std::cout << ++i << ": " << it->first << " " << it->second << std::endl;
-    //         it++;
-    //         // std::cout << " NNN " << std::endl;
-    //     }
-    //     std::cout << "//--//--//--" << std::endl;
-    // }
-    // std::cout << "**************************" << std::endl;
-
-    // ft::pair<ft::map<int, int>::iterator , bool> pair2 = mp.insert(ft::make_pair(9, 9));
 
     // {
-    //     ft::map<int, int>::iterator it = mp.end();
-    //     ft::map<int, int>::iterator it_end = mp.begin();
-    //     std::cout << &it << std::endl;
-    //     std::cout << &it_end << std::endl;
-    //     std::cout << std::endl;
-    //     while (--it != it_end)
-    //     {
-    //         std::cout << &it << std::endl;
-    //         std::cout << " TTT " << " " << it->first << " " << it->second << std::endl;
-    //         std::cout << " NNN " << std::endl;
-    //     }
-        
-    //     std::cout << "//--//--//--" << std::endl;
-    // }
-
-    // {
+    //     std::cout << "//--//--//--CONSTRUCTOR/--//--//--//" << std::endl;
     //     ft::map<int, int> mp;
-    //     ft::pair<ft::map<int, int>::iterator , bool> pair = mp.insert(ft::make_pair(7, 77));
-    //     ft::map<int, int>::iterator it = mp.begin();
-    //     mp.insert(ft::make_pair(9, 9));
-    //     ft::pair<ft::map<int, int>::iterator , bool> pair2 = mp.insert(ft::make_pair(9, 99));
-    //     ft::map<int, int>::iterator it2 = pair.first;
-
-    //     ft::map<int, int>::iterator itt = mp.begin();
-    //     ft::map<int, int>::iterator itt_end = mp.end();
-    //     int i = -1;
-    //     while (itt != itt_end)
-    //     {
-    //         std::cout << ++i << ": " << itt->first << " " << itt->second << std::endl;
-    //         itt++;
-    //     }
-
-    //     for (int i = 0, j = 0; i < 12; ++i, ++j) {
-    //         // std::cout << "** " << i << std::endl;
+    //     // mp.insert(ft::make_pair<int, int>(0, 15));
+    //     // mp.insert(ft::make_pair<int, int>(5, 25));
+    //     int koef = 30;
+    //     for (int i = 0, j = 10; i < koef * _ratio; ++i, ++j) {
     //         mp.insert(ft::make_pair(i, j));
     //     }
+    //     // std::cout << "//--//--//--CONSTRUCTOR/--//--//--//" << std::endl;
 
-    //     // itt = mp.begin();
-    //     // itt_end = mp.end();
-    //     // while (itt != itt_end)
-    //     // {
-    //     //     std::cout << ++i << ": " << itt->first << " " << itt->second << std::endl;
-    //     //     itt++;
+    //     ft::map<int, int> mp2(mp.begin(), mp.end());
+    //     std::cout << " MP = " << mp.size() << std::endl;
+    //     // print_tree(mp.begin(), mp.end(), mp.size());
+    //     std::cout << " MP2 = " << mp2.size() << std::endl;
+    //     // print_tree(mp2.begin(), mp2.end(), mp2.size());
+    //     std::cout << "//--//--//--END/--//--//--//" << std::endl;
+    // }
+
+    // {
+    //     std::cout << "//--//--//--CONSTRUCTOR COPY/--//--//--//" << std::endl;
+    //     ft::map<int, int> mp;
+    //     // for (int i = 0, j = 10; i < 10; ++i, ++j) {
+    //     //     mp.insert(ft::make_pair(i, j));
     //     // }
-        
+    //     ft::map<int, int> mp2 = construct_map(mp);
+    //     print_tree(mp.begin(), mp.end(), mp.size());
     // }
 
     // find test
     // {
+    //     std::cout << "//--//--//--FIND/--//--//--//" << std::endl;
     //     int ft_ratio = 1;
     //     int begin = 10;
     //     int search = 5;
@@ -147,17 +99,24 @@ int main(int argc, char** argv) {
     {
         std::cout << "ERASE TESR" << std::endl;
         ft::map<int, int> mp;
-        int _ratio = 10;
+        int _ratio = 3;
         std::cout << "number of erase " << mp.erase(3) << std::endl;
         for (int i = 0, j = 0; i < 1 * _ratio; ++i, ++j)
             mp.insert(ft::make_pair(i, j));
+        // mp.insert(ft::make_pair(0, 0));
+        // mp.insert(ft::make_pair(5, 5));
         ft::map<int,int>::iterator it = mp.begin();
-        std::cout << it->first <<std::endl;
-        std::cout << "number of erase " << mp.erase(-5) << ", current size:" << mp.size() << std::endl;
-        std::cout << "number of erase " << mp.erase(0) << ", current size:" << mp.size() << std::endl;
-        // ft::map<int,int>::iterator it4 = mp.begin();
+        // print_tree(mp.begin(), mp.end(), mp.size());
+        // std::cout << "number of erase " << mp.erase(-5) << ", current size:" << mp.size() << std::endl;
+        print_tree(mp.begin(), mp.end(), mp.size());
+        // std::cout << "number of erase " << mp.erase(0) << ", current size:" << mp.size() << std::endl;
+        mp.erase(mp.begin());
+        print_tree(mp.begin(), mp.end(), mp.size());
+        ft::map<int,int>::iterator it4 = mp.begin();
+        // std::cout << "  " << it4->first << " " << it4->second << ", current size:" << mp.size() << std::endl;
         // g_start2 = timer();
         // int i = -1;
+        std::cout << "ERASE" << std::endl;
         // for (; it4 != mp.end() && i < 10; it4 = mp.begin())
         //     std::cout << ++i << ": number of erase " << mp.erase(it4->first) << ", current size:" << mp.size() << std::endl;
         // // g_end2 = timer();
@@ -175,6 +134,6 @@ int main(int argc, char** argv) {
         // std::cout << "Current size:" << mp.size() << std::endl;
     }
 
-	std::cout << std::endl;
+	// std::cout << std::endl;
 	return (0);
 }

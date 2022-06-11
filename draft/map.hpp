@@ -44,42 +44,22 @@ namespace ft
 
 	private:
 
-		typedef rb_tree<value_type, value_compare, allocator_type>	__base;
-		typedef typename __base::node_allocator						node_allocator;
-		typedef typename __base::node_pointer						node_pointer;
+		typedef rb_tree<value_type, value_compare, allocator_type>   __base;
+		// typedef typename __base::node_pointer						node_poiner;
 
 		__base			__tree_;
 		key_compare		_key_comp;
 		allocator_type	_alloc;
 
-		node_pointer init_node(const value_type& __vt)
-		{
-			pointer __p_vt = _alloc.allocate(1);
-			_alloc.construct(__p_vt, __vt);
-			node_allocator _node_alloc;
-			node_pointer __node_ptr = _node_alloc.allocate(1);
-			_node_alloc.construct(__node_ptr, __p_vt);
-			return __node_ptr;
-		}
-
-		void destroy_node(node_pointer _node)
-		{
-			node_allocator _node_alloc;
-			if (_node->value)
-			{
-				_alloc.destroy(_node->value);
-				_alloc.deallocate(_node->value, 1);				
-			}
-			_node_alloc.destroy(_node);
-			_node_alloc.deallocate(_node, 1);
-		}
-
 	public:
+
+		// typedef typename __base::iterator					iterator;
+		// typedef tree_iter<typename __base::node_pointer>		iterator;
 
 		template <class Key2, class Value2, class Comp2, class Alloc2>
 			friend class map;
-
 //construct/copy/destroy:
+		// map() : __tree_(), _key_comp(), _alloc() {}
 
 		explicit map(const key_compare& __comp = key_compare(), const allocator_type& __a = allocator_type())
 			: __tree_(value_compare(__comp)), _key_comp(__comp), _alloc(__a) {}
@@ -88,7 +68,6 @@ namespace ft
 		map( InputIter first, InputIter last, const key_compare& __comp = Compare(),const allocator_type& __a = Allocator() )
 			: __tree_(value_compare(__comp)), _key_comp(__comp), _alloc(__a)
 		{
-			// std::cout << "IterConstructor" <<std::endl;
 			while (first != last)
 			{
 				insert(*first);
@@ -96,12 +75,10 @@ namespace ft
 			}
 		}
 
-		map(const map& __m) : __tree_(__m.__tree_), _key_comp(__m._key_comp), _alloc(__m._alloc) {}
-
-		~map()
-		{
-			// std::cout << "~map()" << std::endl;
-		}
+		// map(const map& __m) : __tree_(__m.__tree_), _key_comp(__m._key_comp), _alloc(__m._alloc)
+		// {
+		// 	insert(__m.begin(), __m.end());
+		// }
 
 		map& operator=(const map& __m)
 		{
@@ -115,9 +92,9 @@ namespace ft
 		allocator_type get_allocator() const {return _alloc;}
 
 //iterators
-		iterator begin() {return iterator(__tree_.begin());}
+		iterator begin() {return iterator(__tree_.begin(), __tree_.get_root());}
 		// const_iterator begin() const {return __tree_.begin();}
-		iterator end() {return iterator(__tree_.end());}
+		iterator end() {return iterator(__tree_.end(), __tree_.get_root());}
 		// const_iterator end() const {return __tree_.end();}
 
 		// reverse_iterator rbegin() {return reverse_iterator(end());}
@@ -131,11 +108,42 @@ namespace ft
 		size_type max_size() const {return __tree_.max_size();}
 
 //element access
-		mapped_type& operator[](const key_type& __k) {}
+		mapped_type& operator[](const key_type& __k)
+		{
+			value_type _vt(__k, T());
+			node_pointer node_ptr = init_node(_vt);
+			node_pointer __find = __tree_.find(node_ptr);
+			if (__find == nullptr)
+			{
+				pair<node_pointer, bool> rez = __tree_.insert(node_ptr);
+				return rez.first->value->second;
+			}
+			else
+			{
+				destroy_node(node_ptr);
+				return __find->value->second; 
+			}
+		}
 
-		mapped_type& at(const key_type& __k) {}
+		mapped_type& at(const key_type& __k){
+			value_type _vt(__k, T());
+			node_pointer node_ptr = init_node(_vt);
+			node_pointer __find = __tree_.find(node_ptr);
+			if (__find == nullptr)
+				throw std::out_of_range("map::at:  key not found");
+			destroy_node(node_ptr);
+			return __find->value->second;
+		}
 
-		const mapped_type& at(const key_type& __k) const {}
+		const mapped_type& at(const key_type& __k) const{
+			value_type _vt(__k, T());
+			node_pointer node_ptr = init_node(_vt);
+			node_pointer __find = __tree_.find(node_ptr);
+			if (__find == nullptr)
+				throw std::out_of_range("map::at:  key not found");
+			destroy_node(node_ptr);
+			return __find->value->second;			
+		}
 
 //modifiers
 
@@ -145,19 +153,19 @@ namespace ft
 		// value_compare  value_comp()    const {return value_compare(__tree_.value_comp().key_comp());}
 
 		pair<iterator, bool> insert(const value_type& __v) {
+		// void insert(const value_type& __v) { 
 			node_pointer node_ptr = init_node(__v);
-			node_pointer rez = __tree_.search(node_ptr);
-			// std::cout << "insert" << std::endl;
-			pair<iterator, bool> ret;
-			if (rez != end())
-			{
-				ret.first = rez;
-				ret.second = false;
-				return ret;
-			}
-			ret.first = __tree_.insert(node_ptr);
-			ret.second = true;
-			return ret;
+			pair<node_pointer, bool> ret = __tree_.insert(node_ptr);
+			if (!ret.second)
+				destroy_node(node_ptr);
+			// std::cout << "insert map" << std::endl;
+			pair<iterator, bool> rez(iterator(ret.first, __tree_.get_root()), ret.second);
+			return rez;
+		}
+
+		void tree_print(void)
+		{
+			__tree_.tree_print();
 		}
 
 		iterator insert(iterator __p, const value_type& __v){
@@ -175,30 +183,30 @@ namespace ft
 			}
 		}
 
-		// iterator erase(const_iterator __p) s{}
+		// iterator erase(const_iterator __p) {return __tree_.erase(__p.__i_);}
 
-		void erase(iterator __p) {
-			node_pointer node_ptr = init_node(*__p);
-			node_pointer rez = __tree_.search(node_ptr);
-			destroy_node(node_ptr);
-			if (rez == end())
-				return ;
-			__tree_.erase(rez);
-			// if (__tree_.is_tree_position(__p))
-			// 	__tree_.erase(&*__p);
-		}
+		// iterator erase(iterator __p)       {return __tree_.erase(__p.__i_);}
 
-		size_type erase(const key_type& __k) {
-			node_pointer node_ptr = init_node(value_type(__k, mapped_type()));
-			node_pointer rez = __tree_.search(node_ptr);
-			destroy_node(node_ptr);
-			if (rez == end())
+		size_type erase(const key_type& __k)
+		{
+			if (size() == 0)
 				return 0;
-			__tree_.erase(rez);
-			return 1;		
+			value_type _vt(__k, T());
+			node_pointer node_ptr = init_node(_vt);
+			node_pointer _find = __tree_.find(node_ptr);
+			destroy_node(node_ptr);
+			if (_find == nullptr)
+			{
+				return 0;
+			}
+			__tree_.erase(_find);
+			// std::cout << "map erase" << std::endl;
+			// destroy_node(_find);
+			return 1;
 		}
 
-		// iterator  erase(const_iterator __f, const_iterator __l) {}
+		// iterator  erase(const_iterator __f, const_iterator __l)
+		// 	{return __tree_.erase(__f.__i_, __l.__i_);}
 
 		void clear() {__tree_.clear();}
 
@@ -206,28 +214,66 @@ namespace ft
 		
 
 //lookup
-		iterator find(const key_type& __k) {
-			node_pointer node_ptr = init_node(value_type(__k, mapped_type()));
-			node_pointer _rez = __tree_.search(node_ptr);
+		iterator find(const key_type& __k){
+			value_type _vt(__k, T());
+			node_pointer node_ptr = init_node(_vt);
+			node_pointer ret = __tree_.find(node_ptr);
 			destroy_node(node_ptr);
-			return iterator(_rez);
+			return iterator(ret, __tree_.get_root());
 		}
 
-		// const_iterator find(const key_type& __k) const {}
+		// const_iterator find(const key_type& __k) const {return __tree_.find(__k);}
 
-		// size_type count(const key_type& __k) const {}
+		size_type count(const key_type& __k) const
+			{return __tree_.__count_unique(__k);}
 
-		// iterator lower_bound(const key_type& __k) {}
+		iterator lower_bound(const key_type& __k)
+			{return __tree_.lower_bound(__k);}
 
-		// const_iterator lower_bound(const key_type& __k) const {}
+		// const_iterator lower_bound(const key_type& __k) const
+		// 	{return __tree_.lower_bound(__k);}
 
-		// iterator upper_bound(const key_type& __k) {}
+		iterator upper_bound(const key_type& __k)
+			{return __tree_.upper_bound(__k);}
 
-		// const_iterator upper_bound(const key_type& __k) const {}
+		// const_iterator upper_bound(const key_type& __k) const
+		// 	{return __tree_.upper_bound(__k);}
 
-		// pair<iterator,iterator> equal_range(const key_type& __k) {}
+		pair<iterator,iterator> equal_range(const key_type& __k)
+			{return __tree_.__equal_range_unique(__k);}
 
-		// pair<const_iterator,const_iterator> equal_range(const key_type& __k) const {}
+		// pair<const_iterator,const_iterator> equal_range(const key_type& __k) const
+		// 	{return __tree_.__equal_range_unique(__k);}
+
+	private:
+		typedef typename __base::node_allocator			 	__node_allocator;
+		typedef typename __base::node_type				 	__node_type;
+		typedef typename __base::node_pointer			 	node_pointer;
+
+
+		node_pointer init_node(const value_type& __vt)
+		{
+			pointer __p_vt = _alloc.allocate(1);
+			_alloc.construct(__p_vt, __vt);
+			__node_allocator _node_alloc;
+			node_pointer __node_ptr = _node_alloc.allocate(1);
+			_node_alloc.construct(__node_ptr, __p_vt);
+			return __node_ptr;
+		}
+
+		void destroy_node(node_pointer _node)
+		{
+			__node_allocator _node_alloc;
+			_node_alloc.destroy(_node);
+			_node_alloc.deallocate(_node, 1);
+		}
+	// 	typedef typename __base::__node_allocator		  __node_allocator;
+	// 	typedef typename __base::__node_pointer		    __node_pointer;
+	// 	typedef typename __base::__node_base_pointer       __node_base_pointer;
+	// 	typedef typename __base::__parent_pointer		  __parent_pointer;
+
+	// 	typedef __map_node_destructor<__node_allocator> _Dp;
+	// 	typedef unique_ptr<__node, _Dp> __node_holder;
 
 	};
 
