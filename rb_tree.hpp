@@ -510,45 +510,6 @@ namespace ft
 		}
 
 // 
-	// iterator lower_bound(const value_type& value)
-	// {
-	// 	iterator last = end();
-	// 	for (iterator first = begin(); first != last; ++first){
-	// 		if(!_compare(*first, value))
-	// 			return (first);
-	// 	}
-	// 	return (last);
-	// }
-
-	// const_iterator lower_bound(const value_type& value) const
-	// {
-	// 	const_iterator last = end();
-	// 	for (const_iterator first = begin(); first != last; ++first){
-	// 		if(!_compare(*first, value))
-	// 			return (first);
-	// 	}
-	// 	return (last);
-	// }
-
-	// iterator upper_bound(const value_type& value)
-	// {
-	// 	iterator last = end();
-	// 	for (iterator first = begin(); first != last; ++first){
-	// 		if(_compare(value, *first))
-	// 			return (first);
-	// 	}
-	// 	return (last);
-	// }
-
-	// const_iterator upper_bound(const value_type& value) const
-	// {
-	// 	const_iterator last = end();
-	// 	for (const_iterator first = begin(); first != last; ++first){
-	// 		if(_compare(value, *first))
-	// 			return (first);
-	// 	}
-	// 	return (last);
-	// }
 
 	iterator lower_bound(const value_type& value) const
 	{
@@ -556,7 +517,7 @@ namespace ft
 		{
 			node_pointer node, remembered;
 			for (node = _root, remembered = _root; node != _end;) {
-				if ((_compare(*node->value, value) || _compare(value, *node->value)))
+				if (!(_compare(*node->value, value) || _compare(value, *node->value)))
 					return iterator(node);
 				if (_compare(value, *node->value)) {
 					remembered = node;
