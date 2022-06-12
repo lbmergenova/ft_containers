@@ -249,7 +249,7 @@ namespace ft
 			if (x->parent == _end)
 			{
 				_root = y;
-				// _root->parent = _end; // ???
+				_root->parent = _end; // ???
 				_end->left = _root;
 			}
 			else if (x == x->parent->left)
@@ -272,7 +272,7 @@ namespace ft
 			if (x->parent == _end)
 			{
 				_root = y;
-				// _root->parent = _end; // ???
+				_root->parent = _end; // ???
 				_end->left = _root;
 			}
 			else if (x == x->parent->left)
@@ -299,7 +299,7 @@ namespace ft
 			if (y == _end)
 			{
 				_root = z;
-				// _root->parent = _end; // ???
+				_root->parent = _end; // ???
 				_end->left = _root;
 			}
 			else if (_compare(*z->value, *y->value)) // _compare(z->value, y->value) z->value < y->value
@@ -372,7 +372,7 @@ namespace ft
 			if (x->parent == _end)
 			{
 				_root = y;
-				// _root->parent = _end; // ???
+				_root->parent = _end; // ???
 				_end->left = _root;
 			}
 			else if (x == x->parent->left)
@@ -510,6 +510,46 @@ namespace ft
 		}
 
 // 
+	// iterator lower_bound(const value_type& value)
+	// {
+	// 	iterator last = end();
+	// 	for (iterator first = begin(); first != last; ++first){
+	// 		if(!_compare(*first, value))
+	// 			return (first);
+	// 	}
+	// 	return (last);
+	// }
+
+	// const_iterator lower_bound(const value_type& value) const
+	// {
+	// 	const_iterator last = end();
+	// 	for (const_iterator first = begin(); first != last; ++first){
+	// 		if(!_compare(*first, value))
+	// 			return (first);
+	// 	}
+	// 	return (last);
+	// }
+
+	// iterator upper_bound(const value_type& value)
+	// {
+	// 	iterator last = end();
+	// 	for (iterator first = begin(); first != last; ++first){
+	// 		if(_compare(value, *first))
+	// 			return (first);
+	// 	}
+	// 	return (last);
+	// }
+
+	// const_iterator upper_bound(const value_type& value) const
+	// {
+	// 	const_iterator last = end();
+	// 	for (const_iterator first = begin(); first != last; ++first){
+	// 		if(_compare(value, *first))
+	// 			return (first);
+	// 	}
+	// 	return (last);
+	// }
+
 	iterator lower_bound(const value_type& value) const
 	{
 		if (_root != nullptr)
@@ -517,35 +557,37 @@ namespace ft
 			node_pointer node, remembered;
 			for (node = _root, remembered = _root; node != _end;) {
 				if ((_compare(*node->value, value) || _compare(value, *node->value)))
-					return node;
-				if (_compare(value, node->data->first)) {
+					return iterator(node);
+				if (_compare(value, *node->value)) {
 					remembered = node;
 					node = node->left;
 				}
 				else
 					node = node->right;
 			}
-			return _compare(value, remembered->data->first) ? iterator(remembered) : end();
+			if (_compare(value, *remembered->value))
+				return iterator(remembered);
 		}
-		return _nil;
+		return end();
 	}
 
-	const_iterator upper_bound(const value_type& value) const
+	iterator upper_bound(const value_type& value) const
 	{
 		if (_root != nullptr)
 		{
 			node_pointer node, remembered;
 			for (node = _root, remembered = _root; node != _end;) {
-				if (_compare(value, node->data->first)) {
+				if (_compare(value, *node->value)) {
 					remembered = node;
 					node = node->left;
 				}
 				else
 					node = node->right;
 			}
-			return _compare(value, remembered->data->first) ? iterator(remembered) : end();
+			if (_compare(value, *remembered->value))
+				return iterator(remembered);
 		}
-		return _nil;
+		return end();
 	}
 
 //
