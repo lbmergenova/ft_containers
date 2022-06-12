@@ -223,41 +223,67 @@ int main(int argc, char** argv) {
     //     std::cout << "//--//--//--END ITERATOR/--//--//--//" << std::endl;
     // }
 
+    // {
+    //      std::cout << "//--//--//--REVERSE ITERATOR/--//--//--//" << std::endl;
+    //     ft::map<int, int> mp;
+    //     ft::map<int, int> mpp;
+    //     fillMap(mpp);
+    //     // mpp.print_root();
+    //     // for (ft::map<int, int>::iterator it = mpp.begin(); it != mpp.end(); it++) { std::cout << "key : " << it->first << std::endl; }
+    //     // // print_tree(mpp.begin(), mpp.end(), mpp.size());
+    //     // for (ft::map<int, int>::iterator it = --mpp.end(); it != mpp.begin(); it--) { std::cout << "revoder key : " << it->first << std::endl; }
+    //     // ft::map<int, int> mp0;
+    //     // ft::map<int, int>::iterator ii = mp0.insert(ft::make_pair(3, 3)).first;
+    //     // ii++;
+    //     // std::cout <<"ii " << (--ii)->first << std::endl;
+    //     for (int i = 0, j = 10; i < 5; ++i, ++j)
+    //         mp.insert(ft::make_pair(i, j));
+    //     print_tree(mp.begin(), mp.end(), mp.size());
+    //     ft::map<int, int>::reverse_iterator it = mp.rbegin();
+    //     ft::map<int, int>::reverse_iterator it2 = --mp.rend();
+    //     std::cout <<"it " << it->first << std::endl;
+    //     it++;
+    //     it++;
+    //     it++;
+    //     it++;
+    //     std::cout <<"it " << it->first << std::endl;
+    //     it++;
+    //     it--;
+    //     std::cout <<"it " << it->first << std::endl;
+    //     it2--;
+    //     std::cout <<"it2 " << it2->first << std::endl;
+    //     std::cout <<"compar " << (it2 == it) << std::endl;
+    //     std::cout <<"it2 " << (--it2)->first << std::endl;
+    //     std::cout <<"it2 " << (it2--)->first << std::endl;
+    //     std::cout <<"it2 " << (it2++)->first << std::endl;
+    //     std::cout <<"it2 " << (++it2)->first << std::endl;
+    //     std::cout << "//--//--//--END ITERATOR/--//--//--//" << std::endl;
+    // }
+
     {
-         std::cout << "//--//--//--REVERSE ITERATOR/--//--//--//" << std::endl;
-        ft::map<int, int> mp;
-        ft::map<int, int> mpp;
-        fillMap(mpp);
-        // mpp.print_root();
+         std::cout << "//--//--//-- OPERATOR== /--//--//--//" << std::endl;
+        ft::map<int, int> m1;
+        ft::map<int, int> m2;
+
+        std::cout << " " << (m1 < m1) << std::endl; 
+        fillMap(m1);
+        // m1.print_root();
+        // std::cout << " " << (m1 == m1) << std::endl; 
         // for (ft::map<int, int>::iterator it = mpp.begin(); it != mpp.end(); it++) { std::cout << "key : " << it->first << std::endl; }
-        print_tree(mpp.begin(), mpp.end(), mpp.size());
-        // for (ft::map<int, int>::iterator it = --mpp.end(); it != mpp.begin(); it--) { std::cout << "revoder key : " << it->first << std::endl; }
-        // ft::map<int, int> mp0;
-        // ft::map<int, int>::iterator ii = mp0.insert(ft::make_pair(3, 3)).first;
-        // ii++;
-        // std::cout <<"ii " << (--ii)->first << std::endl;
-        for (int i = 0, j = 10; i < 5; ++i, ++j)
-            mp.insert(ft::make_pair(i, j));
-        ft::map<int, int>::reverse_iterator it = mp.rbegin();
-        ft::map<int, int>::reverse_iterator it2 = --mp.rend();
-        std::cout <<"it " << it->first << std::endl;
-        // it++;
-        // it++;
-        // it++;
-        // it++;
-        // std::cout <<"it " << it->first << std::endl;
-        // it++;
-        // it--;
-        // std::cout <<"it " << it->first << std::endl;
-        // it2--;
-        // std::cout <<"it2 " << it2->first << std::endl;
-        // std::cout <<"compar " << (it2 == it) << std::endl;
-        // std::cout <<"it2 " << (--it2)->first << std::endl;
-        // std::cout <<"it2 " << (it2--)->first << std::endl;
-        // std::cout <<"it2 " << (it2++)->first << std::endl;
-        // std::cout <<"it2 " << (++it2)->first << std::endl;
-        std::cout << "//--//--//--END ITERATOR/--//--//--//" << std::endl;
+        print_tree(m1.begin(), m1.end(), m1.size());
+
+        std::cout << "//--//--//--END OPERATOR==/--//--//--//" << std::endl;
     }
-	// std::cout << std::endl;
+
+    // {
+    //     ft::map<int, int> m1;
+    //     fillMap(m1);
+    //     ft::map<int, int>::iterator it = m1.begin();
+    //     ft::map<int, int>::const_iterator itc = m1.end();
+    //     ft::map<int, int>::const_iterator itc2 = m1.begin();
+    //     it = itc;
+    //     itc = it;
+    // }
+
 	return (0);
 }

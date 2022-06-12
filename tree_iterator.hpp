@@ -44,21 +44,21 @@ namespace ft
 //________________________________________________________________________________________________________
 
 	// template <class Key, class T, class _Tp>
-	template <class _Tp>
+	template <class T, class _Tp>
 	class tree_iter
 	{
 	public:
-
-		typedef Node<_Tp> *													iterator_type; // _Tp = pair<class U, class V>
+	
+		typedef _Tp															iterator_type; // _Tp = pair<class U, class V>
 		typedef std::bidirectional_iterator_tag								iterator_category;
 		typedef typename iterator_traits<iterator_type>::value_type			value_type;
 		typedef typename iterator_traits<iterator_type>::difference_type	difference_type;
-		typedef typename iterator_traits<iterator_type>::pointer			node_pointer;
-		typedef  _Tp*														pointer;
-		typedef  _Tp&														reference;
+		typedef typename iterator_traits<iterator_type>::pointer			pointer;
+		typedef typename iterator_traits<iterator_type>::reference			reference;
 
 	private:
-		iterator_type	__p_node;
+		typedef Node<T> *						node_pointer;
+		node_pointer	__p_node;
 
 		inline node_pointer min(node_pointer p_x)
 		{
@@ -125,24 +125,20 @@ namespace ft
 
 		tree_iter(node_pointer _x) : __p_node(_x) {}
 
-		tree_iter(const tree_iter& other) : __p_node(other.__p_node) {}
+        template<class U>
+		tree_iter(const tree_iter<T, U>& other) : __p_node(other.base()) {}
 
 		~tree_iter() {}
 
 		tree_iter& operator=(const tree_iter& other)
 		{
 			if (this != &other)
-			{
 				__p_node = other.__p_node;
-			}
 			return *this;
 		}
 
 		reference operator*() const { return *(__p_node->value) ;}
 		pointer operator->() const { return __p_node->value ; }
-		// _Tp& operator*() const { return *(__p_node->value) ;}
-		// _Tp* operator->() const { return __p_node->value ; }
-
 
         tree_iter& operator++()
         {
@@ -172,7 +168,7 @@ namespace ft
             return tmp;
         }
 
-        node_pointer base()
+        node_pointer base() const
         {
 			return __p_node;
         }

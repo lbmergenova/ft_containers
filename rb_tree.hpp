@@ -18,6 +18,7 @@ namespace ft
 		typedef Compare										value_compare;
 		typedef Allocator									allocator_type;
 		typedef typename allocator_type::pointer			pointer;
+		typedef typename allocator_type::const_pointer		const_pointer;
 
 		typedef typename Allocator::template
 		rebind<Node<T> >::other								node_allocator;
@@ -27,19 +28,16 @@ namespace ft
 		typedef typename node_allocator::reference			node_reference;
 		typedef typename node_allocator::const_reference	node_const_reference;
 		typedef typename node_allocator::size_type			size_type;
-		// typedef tree_iter<node_pointer>						iterator;
-		// typedef tree_iter<node_const_pointer>				const_iterator;
-		// typedef tree_iter<value_type>						iterator;
-		// typedef tree_iter<const value_type>					const_iterator;
-		// typedef ft::reverse_iterator<iterator>					reverse_iterator;
-		// typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
+		typedef tree_iter<value_type, pointer>				iterator;
+		typedef tree_iter<value_type, const_pointer>		const_iterator;
+		typedef ft::reverse_iterator<iterator>				reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator>		const_reverse_iterator;
 
 	private:
 		node_allocator											_node_alloc;
 		value_compare 											_compare;
 		node_pointer											_end;
 		node_pointer											_root;
-		// node_pointer											_nill;
 		size_type												_size;
 
 
@@ -59,9 +57,7 @@ namespace ft
 			_node_alloc.construct(_end, node_type(false));
 			if (__t.size() == 0)
 				return;
-			// if (__t.begin() == __t.end())
-			// 	return;
-			node_const_pointer x = __t.min(__t._root);
+			node_const_pointer x = __t.min_const(__t._root);
 			node_pointer _node;
 			while (x != __t._end)
 			{
@@ -156,6 +152,21 @@ namespace ft
 			return node;
 		}
 
+		node_pointer search(value_type _v) const
+		{
+			node_pointer node = _root;
+			if (!node)
+				return _end;
+			while (node != _end && (_compare(*node->value, _v) || _compare(_v, *node->value))) 
+			{
+				if (_compare(_v, *node->value))
+					node = node->left;
+				else
+					node = node->right;
+			}
+			return node;
+		}
+
 		node_pointer search(node_pointer& key_node)
 		{
 			return search(_root, key_node); 
@@ -178,7 +189,7 @@ namespace ft
 			return true; 
 		}
 
-		node_pointer min(node_pointer p_x)
+		node_pointer min(node_pointer p_x) const
 		{
 			while (p_x->left != nullptr && p_x->left->value != nullptr)
 			{
@@ -187,7 +198,7 @@ namespace ft
 			return p_x;
 		}
 
-		node_const_pointer min(node_pointer p_x) const
+		node_const_pointer min_const(node_pointer p_x) const
 		{
 			while (p_x->left != nullptr && p_x->left->value != nullptr)
 					p_x = p_x->left;
@@ -197,7 +208,7 @@ namespace ft
 		node_const_pointer successor(node_const_pointer x) const
 		{
 			if (x->value != nullptr && x->right->value != nullptr)
-				return min(x->right);
+				return min_const(x->right);
 			node_pointer y = x->parent;
 			while (y->value != nullptr && x == y->right)
 			{
@@ -207,14 +218,16 @@ namespace ft
 			return y;
         }
 
-		void print_root()
-		{std::cout << "ROOT " << _root->value->first << " " << _root->value->second << std::endl;}
-
 	//iterators
-			node_pointer begin() {return min(_end);}
-			node_const_pointer begin() const {return min(_end);}
-			node_pointer end() {return _end;}
-			node_const_pointer end() const {return _end;}
+			iterator begin() {return min(_end);}
+			const_iterator begin() const {return min(_end);}
+			iterator end() {return _end;}
+			const_iterator end() const {return _end;}
+
+			reverse_iterator rbegin() {return reverse_iterator(end());}
+			const_reverse_iterator rbegin() const {return const_reverse_iterator(end());}
+			reverse_iterator rend() {return reverse_iterator(begin());}
+			const_reverse_iterator rend() const {return const_reverse_iterator(begin());}
 
 	//capacity
 			bool      empty() const {return _size == 0;}
@@ -226,7 +239,6 @@ namespace ft
 
 		void rotate_left(node_pointer x)
 		{
-			// std::cout << "  rotate_left" << std::endl;
 			if (x == _end)
 				return ;
 			node_pointer y = x->right;
@@ -237,7 +249,7 @@ namespace ft
 			if (x->parent == _end)
 			{
 				_root = y;
-				_root->parent = _end; // ???
+				// _root->parent = _end; // ???
 				_end->left = _root;
 			}
 			else if (x == x->parent->left)
@@ -260,7 +272,7 @@ namespace ft
 			if (x->parent == _end)
 			{
 				_root = y;
-				_root->parent = _end; // ???
+				// _root->parent = _end; // ???
 				_end->left = _root;
 			}
 			else if (x == x->parent->left)
@@ -287,7 +299,7 @@ namespace ft
 			if (y == _end)
 			{
 				_root = z;
-				_root->parent = _end; // ???
+				// _root->parent = _end; // ???
 				_end->left = _root;
 			}
 			else if (_compare(*z->value, *y->value)) // _compare(z->value, y->value) z->value < y->value
@@ -357,11 +369,10 @@ namespace ft
 
 		void transplant(node_pointer& x, node_pointer& y)
 		{
-			// std::cout << "transplant" <<std::endl;
 			if (x->parent == _end)
 			{
 				_root = y;
-				_root->parent = _end; // ???
+				// _root->parent = _end; // ???
 				_end->left = _root;
 			}
 			else if (x == x->parent->left)
@@ -488,21 +499,61 @@ namespace ft
 		}
 
 		void swap(rb_tree& other){
-			// if (this != other)
-			// {
+			if (this != other)
+			{
 				std::swap(_node_alloc, other._node_alloc);
 				std::swap(_compare, other._compare);
 				std::swap(_end, other._end);
 				std::swap(_root, other._root);
 				std::swap(_size, other._size);
-			// }
+			}
 		}
 
-		// friend inline bool operator==(const rb_tree& __x, const rb_tree& __y) 
-		// { return __x.size() == __y.size() && ft::equal(__x.begin(), __x.end(), __y.begin()); }
+// 
+	iterator lower_bound(const value_type& value) const
+	{
+		if (_root != nullptr)
+		{
+			node_pointer node, remembered;
+			for (node = _root, remembered = _root; node != _end;) {
+				if ((_compare(*node->value, value) || _compare(value, *node->value)))
+					return node;
+				if (_compare(value, node->data->first)) {
+					remembered = node;
+					node = node->left;
+				}
+				else
+					node = node->right;
+			}
+			return _compare(value, remembered->data->first) ? iterator(remembered) : end();
+		}
+		return _nil;
+	}
 
-		// friend  inline bool operator<(const rb_tree& __x, const rb_tree& __y) 
-		// { return ft::lexicographical_compare(__x.begin(), __x.end(), __y.begin(), __y.end(), rb_value_compare(__x._compare)); }
+	const_iterator upper_bound(const value_type& value) const
+	{
+		if (_root != nullptr)
+		{
+			node_pointer node, remembered;
+			for (node = _root, remembered = _root; node != _end;) {
+				if (_compare(value, node->data->first)) {
+					remembered = node;
+					node = node->left;
+				}
+				else
+					node = node->right;
+			}
+			return _compare(value, remembered->data->first) ? iterator(remembered) : end();
+		}
+		return _nil;
+	}
+
+//
+		friend inline bool operator==(const rb_tree& __x, const rb_tree& __y) 
+		{ return __x.size() == __y.size() && ft::equal(__x.begin(), __x.end(), __y.begin()); }
+
+		friend  inline bool operator<(const rb_tree& __x, const rb_tree& __y) 
+		{ return ft::lexicographical_compare(__x.begin(), __x.end(), __y.begin(), __y.end()); }
 	};
 
 
