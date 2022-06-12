@@ -48,6 +48,13 @@ namespace ft
 	{
 	public:
 
+		// typedef _Tp															iterator_type; // _Tp = pair<class U, class V>
+		// typedef std::bidirectional_iterator_tag								iterator_category;
+		// typedef typename iterator_traits<iterator_type>::value_type			value_type;
+		// typedef typename iterator_traits<iterator_type>::difference_type	difference_type;
+		// typedef typename iterator_traits<iterator_type>::pointer			pointer;
+		// typedef typename iterator_traits<iterator_type>::reference			reference;
+		// // typedef _Tp															iterator_type; // _Tp = pair<class U, class V>
 		typedef Node<_Tp> *													iterator_type; // _Tp = pair<class U, class V>
 		typedef std::bidirectional_iterator_tag								iterator_category;
 		typedef typename iterator_traits<iterator_type>::value_type			value_type;
@@ -67,14 +74,15 @@ namespace ft
 
 		inline pointer max(pointer p_x)
 		{
+			// std::cout << "max \n"; // << p_x->value->first <<std::endl;
 			while (p_x->right->value != nullptr)
 				p_x = p_x->right;
+			// std::cout << "max\n";
 			return p_x;
 		}
 
 		pointer next(pointer x)
 		{
-			// std::cout << "next->" << std::endl;
 			if (x->value != nullptr && x->right->value != nullptr)
 				return min(x->right);
 			pointer y = x->parent;
@@ -83,21 +91,34 @@ namespace ft
 				x = y;
 				y = y->parent;
 			}
-			// std::cout << "<-next" << std::endl;
-			// if (y != nullptr)
-			// 	std::cout << "y " << y->value->first << std::endl;
-			// else
-			// 	std::cout << "y = null" << std::endl;
 			return y;
         }
 
         pointer prev(pointer x)
         {
-			if (x != nullptr && x->left != nullptr)
-				return max(x->left);
-			pointer y = x->parent;
-			while (y != nullptr && x == y->left)
+			// if (x && x->value)
+				// std::cout << "input " << x->value->first <<std::endl;
+			if (x->value == nullptr && x->left != nullptr)
 			{
+				// std::cout << "! " <<std::endl;
+				return max(x->left);
+			}
+			pointer y = x->parent;
+			if (y->value == nullptr)
+			{
+				// std::cout << "!! " <<std::endl;
+				if (x->left->value != nullptr)
+					return max(x->left);
+				return x;
+			}
+			if (x->value != nullptr && x->left->value != nullptr)
+			{
+				// std::cout << "!!! " <<std::endl;
+				return max(x->left);
+			}
+			while (x->value != nullptr && x == y->left)
+			{
+				// std::cout << "!!! " <<std::endl;
 				x = y;
 				y = y->parent;
 			}
@@ -109,10 +130,23 @@ namespace ft
 
 		tree_iter(pointer _x) : __p_node(_x) {}
 
-		_Tp& operator*() const {return *(__p_node->value) ;}
-		_Tp* operator->() const {
-			// std::cout << "operator->" << std::endl;
-			return __p_node->value ;}
+		tree_iter(const tree_iter& other) : __p_node(other.__p_node) {}
+
+		~tree_iter() {}
+
+		tree_iter& operator=(const tree_iter& other)
+		{
+			if (this != &other)
+			{
+				__p_node = other.__p_node;
+			}
+			return *this;
+		}
+
+		// reference operator*() const { return *(__p_node->value) ;}
+		// pointer operator->() const { return __p_node->value ; }
+		_Tp& operator*() const { return *(__p_node->value) ;}
+		_Tp* operator->() const { return __p_node->value ; }
 
 
         tree_iter& operator++()
@@ -124,11 +158,9 @@ namespace ft
 
         tree_iter operator++(int)
         {
-			// std::cout << "operator++" << std::endl;
             tree_iter tmp(*this);
 			pointer	t;
             __p_node = next(__p_node);
-			// std::cout << "end operator++" << std::endl;
             return tmp;
         }
 
@@ -145,6 +177,11 @@ namespace ft
             return tmp;
         }
 
+        pointer base()
+        {
+			return __p_node;
+        }
+
 		friend bool operator==(const tree_iter& __x, const tree_iter& __y)
 		{ return __x.__p_node == __y.__p_node; }
 
@@ -152,6 +189,7 @@ namespace ft
 		{ return __x.__p_node != __y.__p_node; }
 
 	};
+
 
 } // namespace ft
 
