@@ -43,31 +43,36 @@ namespace ft
 //________________________________________________________________________________________________________
 //________________________________________________________________________________________________________
 
-	// template <class Key, class T, class _Tp>
 	template <class _Tp>
 	class tree_iter
 	{
 	public:
 
+		// typedef _Tp															iterator_type; // _Tp = pair<class U, class V>
+		// typedef std::bidirectional_iterator_tag								iterator_category;
+		// typedef typename iterator_traits<iterator_type>::value_type			value_type;
+		// typedef typename iterator_traits<iterator_type>::difference_type	difference_type;
+		// typedef typename iterator_traits<iterator_type>::pointer			pointer;
+		// typedef typename iterator_traits<iterator_type>::reference			reference;
+		// // typedef _Tp															iterator_type; // _Tp = pair<class U, class V>
 		typedef Node<_Tp> *													iterator_type; // _Tp = pair<class U, class V>
 		typedef std::bidirectional_iterator_tag								iterator_category;
 		typedef typename iterator_traits<iterator_type>::value_type			value_type;
 		typedef typename iterator_traits<iterator_type>::difference_type	difference_type;
-		typedef typename iterator_traits<iterator_type>::pointer			node_pointer;
-		typedef  _Tp*														pointer;
-		typedef  _Tp&														reference;
+		typedef typename iterator_traits<iterator_type>::pointer			pointer;
+		typedef typename iterator_traits<iterator_type>::reference			reference;
 
 	private:
 		iterator_type	__p_node;
 
-		inline node_pointer min(node_pointer p_x)
+		inline pointer min(pointer p_x)
 		{
 			while (p_x->left->value != nullptr)
 				p_x = p_x->left;
 			return p_x;
 		}
 
-		inline node_pointer max(node_pointer p_x)
+		inline pointer max(pointer p_x)
 		{
 			// std::cout << "max \n"; // << p_x->value->first <<std::endl;
 			while (p_x->right->value != nullptr)
@@ -76,11 +81,11 @@ namespace ft
 			return p_x;
 		}
 
-		node_pointer next(node_pointer x)
+		pointer next(pointer x)
 		{
 			if (x->value != nullptr && x->right->value != nullptr)
 				return min(x->right);
-			node_pointer y = x->parent;
+			pointer y = x->parent;
 			while (y->value != nullptr && x == y->right)
 			{
 				x = y;
@@ -89,7 +94,7 @@ namespace ft
 			return y;
         }
 
-        node_pointer prev(node_pointer x)
+        pointer prev(pointer x)
         {
 			// if (x && x->value)
 				// std::cout << "input " << x->value->first <<std::endl;
@@ -98,7 +103,7 @@ namespace ft
 				// std::cout << "! " <<std::endl;
 				return max(x->left);
 			}
-			node_pointer y = x->parent;
+			pointer y = x->parent;
 			if (y->value == nullptr)
 			{
 				// std::cout << "!! " <<std::endl;
@@ -123,7 +128,7 @@ namespace ft
 	public:
 		tree_iter() {}
 
-		tree_iter(node_pointer _x) : __p_node(_x) {}
+		tree_iter(pointer _x) : __p_node(_x) {}
 
 		tree_iter(const tree_iter& other) : __p_node(other.__p_node) {}
 
@@ -138,15 +143,15 @@ namespace ft
 			return *this;
 		}
 
-		reference operator*() const { return *(__p_node->value) ;}
-		pointer operator->() const { return __p_node->value ; }
-		// _Tp& operator*() const { return *(__p_node->value) ;}
-		// _Tp* operator->() const { return __p_node->value ; }
+		// reference operator*() const { return *(__p_node->value) ;}
+		// pointer operator->() const { return __p_node->value ; }
+		_Tp& operator*() const { return *(__p_node->value) ;}
+		_Tp* operator->() const { return __p_node->value ; }
 
 
         tree_iter& operator++()
         {
-			node_pointer	t;
+			pointer	t;
             __p_node = next(__p_node);
             return *this;
         }
@@ -154,7 +159,7 @@ namespace ft
         tree_iter operator++(int)
         {
             tree_iter tmp(*this);
-			node_pointer	t;
+			pointer	t;
             __p_node = next(__p_node);
             return tmp;
         }
@@ -172,7 +177,7 @@ namespace ft
             return tmp;
         }
 
-        node_pointer base()
+        pointer base()
         {
 			return __p_node;
         }

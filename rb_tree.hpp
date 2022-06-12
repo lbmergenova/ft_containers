@@ -29,10 +29,10 @@ namespace ft
 		typedef typename node_allocator::size_type			size_type;
 		// typedef tree_iter<node_pointer>						iterator;
 		// typedef tree_iter<node_const_pointer>				const_iterator;
-		typedef tree_iter<value_type>						iterator;
-		typedef tree_iter<const value_type>					const_iterator;
-		typedef ft::reverse_iterator<iterator>					reverse_iterator;
-		typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
+		// typedef tree_iter<value_type>						iterator;
+		// typedef tree_iter<const value_type>					const_iterator;
+		// typedef ft::reverse_iterator<iterator>					reverse_iterator;
+		// typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 
 	private:
 		node_allocator											_node_alloc;

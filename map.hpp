@@ -25,11 +25,11 @@ namespace ft
 		typedef typename allocator_type::const_pointer		const_pointer;
 		typedef typename allocator_type::size_type			size_type;
 		typedef typename allocator_type::difference_type	difference_type;
-		// typedef tree_iter<value_type>						iterator;
-		// typedef tree_iter<const value_type>					const_iterator;
+		typedef tree_iter<value_type>						iterator;
+		typedef tree_iter<const value_type>					const_iterator;
 		// // typedef __map_const_iterator<typename __base::const_iterator> const_iterator;
-		// typedef ft::reverse_iterator<iterator>					reverse_iterator;
-		// typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
+		typedef ft::reverse_iterator<iterator>					reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 		// typedef reverse_tree_iter<iterator>					reverse_iterator;
 		// typedef reverse_tree_iter<const_iterator>			const_reverse_iterator;
 
@@ -56,12 +56,12 @@ namespace ft
 		key_compare		_key_comp;
 		allocator_type	_alloc;
 
-	public:
+	// public:
 
-		typedef typename __base::iterator							iterator;
-		typedef typename __base::const_iterator				const_iterator;
-		typedef typename __base::reverse_iterator					reverse_iterator;
-		typedef typename __base::const_reverse_iterator			const_reverse_iterator;
+		// typedef typename __base::iterator							iterator;
+		// typedef typename __base::const_iterator				const_iterator;
+		// typedef typename __base::reverse_iterator					reverse_iterator;
+		// typedef typename __base::const_reverse_iterator			const_reverse_iterator;
 		// typedef tree_iter<value_type>							iterator;
 		// typedef tree_iter<const value_type>					const_iterator;
 		// typedef ft::reverse_iterator<iterator>					reverse_iterator;
