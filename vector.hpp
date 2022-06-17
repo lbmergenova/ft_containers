@@ -50,7 +50,7 @@ namespace ft
 		template <class InputIter>
 		vector(InputIter __first, InputIter __last, const Allocator& _a = Allocator(), 
 		       typename ft::enable_if<!ft::is_integral<InputIter>::value, void>::type* = 0) //?????
-			   : _begin(nullptr), _end(nullptr), _end_cap(nullptr), _alloc(_a)
+			   :  _alloc(_a), _begin(nullptr), _end(nullptr), _end_cap(nullptr)
 		{
 			size_type n = __last - __first;
 			if (n > max_size())
@@ -188,21 +188,21 @@ namespace ft
 //element access
 		reference       operator[](size_type n){
 			assert(n < size() && "vector[] index out of bounds");
-			return _begin[n]; // *(_begin + n); 	
+			return _begin[n];	
 		}
 		const_reference operator[](size_type n) const{
 			assert(n < size() && "vector[] index out of bounds");
-			return _begin[n]; // *(_begin + n); 			
+			return _begin[n];			
 		}
 		reference       at(size_type n){
 			if (n >= size())
 				throw std::out_of_range("vector");
-			return _begin[n]; // *(_begin + n); 	
+			return _begin[n];	
 		}
 		const_reference at(size_type n) const{
 			if (n >= size())
 				throw std::out_of_range("vector");
-			return _begin[n]; // *(_begin + n); 	
+			return _begin[n];	
 		}
 		reference       front() { return *_begin; }
 		const_reference front() const { return *_begin; }
